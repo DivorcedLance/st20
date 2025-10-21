@@ -1,0 +1,74 @@
+[
+  {
+    "course": "Matemáticas",
+    "topic": "Álgebra Básica",
+    "type": "Multiple Choice",
+    "question": "¿Cuál es el resultado de **2 + 2**?",
+    "options": ["3", "4", "5", "6"],
+    "correct_answer": 1,
+    "explanation": "La suma de 2 + 2 es **4**",
+    "time_limit": 30
+  },
+  {
+    "course": "Matemáticas",
+    "topic": "Álgebra Básica",
+    "type": "True or False",
+    "question": "El número π es igual a 3.14",
+    "correct_answer": false,
+    "explanation": "π es aproximadamente 3.14159..., no exactamente 3.14"
+  },
+  {
+    "course": "Historia",
+    "topic": "Historia Universal",
+    "type": "True or False",
+    "question": "La Segunda Guerra Mundial terminó en 1945",
+    "correct_answer": true,
+    "explanation": "La guerra terminó el **2 de septiembre de 1945** con la rendición de Japón",
+    "time_limit": 20
+  },
+  {
+    "course": "Historia",
+    "topic": "Historia Universal",
+    "type": "Multiple Choice",
+    "question": "¿En qué año se descubrió América?",
+    "options": ["1492", "1500", "1776", "1810"],
+    "correct_answer": 0,
+    "explanation": "Cristóbal Colón llegó a América el **12 de octubre de 1492**"
+  },
+  {
+    "course": "Programación",
+    "topic": "JavaScript",
+    "type": "Multiple Choice",
+    "question": "¿Cuál de estos NO es un tipo de dato primitivo en JavaScript?",
+    "options": ["string", "number", "array", "boolean"],
+    "correct_answer": 2,
+    "explanation": "Los arrays son objetos, no tipos primitivos. Los tipos primitivos son: string, number, boolean, null, undefined, symbol, bigint"
+  },
+  {
+    "course": "Programación",
+    "topic": "JavaScript",
+    "type": "True or False",
+    "question": "JavaScript y Java son el mismo lenguaje",
+    "correct_answer": false,
+    "explanation": "JavaScript y Java son lenguajes completamente diferentes, aunque comparten un nombre similar"
+  },
+  {
+    "course": "Ciencias",
+    "topic": "Física",
+    "type": "Multiple Choice",
+    "question": "¿Cuál es la velocidad de la luz en el vacío?",
+    "options": ["300,000 km/s", "150,000 km/s", "450,000 km/s", "600,000 km/s"],
+    "correct_answer": 0,
+    "explanation": "La velocidad de la luz en el vacío es aproximadamente **299,792 km/s**, redondeado a 300,000 km/s",
+    "time_limit": 45
+  },
+  {
+    "course": "Ciencias",
+    "topic": "Química",
+    "type": "True or False",
+    "question": "El agua está compuesta por hidrógeno y oxígeno",
+    "correct_answer": true,
+    "explanation": "El agua (H₂O) está compuesta por **2 átomos de hidrógeno y 1 átomo de oxígeno**"
+  }
+]
+

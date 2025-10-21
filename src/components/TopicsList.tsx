@@ -207,7 +207,7 @@ export default function TopicsList({ initialTopics, courses }: TopicsListProps) 
           {topics.map((topic) => (
             <div
               key={topic.id}
-              className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
             >
               <div>
                 <div className="font-medium text-gray-900 dark:text-white">
@@ -216,10 +216,10 @@ export default function TopicsList({ initialTopics, courses }: TopicsListProps) 
                 <div className="text-sm text-gray-500 dark:text-gray-400">{topic.course_name}</div>
               </div>
               <div className="flex space-x-2">
-                <Button size="sm" variant="outline" onClick={() => handleEdit(topic)}>
+                <Button size="sm" variant="outline" onClick={() => handleEdit(topic)} className="flex-1 sm:flex-none">
                   Editar
                 </Button>
-                <Button size="sm" variant="destructive" onClick={() => handleDelete(topic.id)}>
+                <Button size="sm" variant="destructive" onClick={() => handleDelete(topic.id)} className="flex-1 sm:flex-none">
                   Eliminar
                 </Button>
               </div>

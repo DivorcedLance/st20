@@ -105,13 +105,14 @@ export default function ExamConfigForm({ courses, topics }: ExamConfigFormProps)
             </p>
             <div className="space-y-2 max-h-48 overflow-y-auto p-2 border rounded">
               {filteredTopics.map((topic) => (
-                <div key={topic.id} className="flex items-center space-x-2">
+                <div key={topic.id} className="flex items-start space-x-2">
                   <Checkbox
                     id={`topic-${topic.id}`}
                     checked={selectedTopicIds.includes(topic.id)}
                     onCheckedChange={() => handleTopicToggle(topic.id)}
+                    className="mt-1"
                   />
-                  <Label htmlFor={`topic-${topic.id}`} className="font-normal cursor-pointer">
+                  <Label htmlFor={`topic-${topic.id}`} className="font-normal cursor-pointer text-sm leading-relaxed">
                     {topic.course_name} - {topic.number}. {topic.name}
                   </Label>
                 </div>
@@ -158,13 +159,14 @@ export default function ExamConfigForm({ courses, topics }: ExamConfigFormProps)
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-start space-x-2">
           <Checkbox
             id="useIndividualTimeLimits"
             checked={useIndividualTimeLimits}
             onCheckedChange={(checked) => setUseIndividualTimeLimits(checked as boolean)}
+            className="mt-1"
           />
-          <Label htmlFor="useIndividualTimeLimits" className="font-normal cursor-pointer">
+          <Label htmlFor="useIndividualTimeLimits" className="font-normal cursor-pointer text-sm leading-relaxed">
             Usar límites de tiempo individuales de cada pregunta
           </Label>
         </div>
@@ -184,7 +186,7 @@ export default function ExamConfigForm({ courses, topics }: ExamConfigFormProps)
         </Alert>
       )}
 
-      <Button type="submit" disabled={loading || courses.length === 0}>
+      <Button type="submit" disabled={loading || courses.length === 0} className="w-full sm:w-auto">
         {loading ? "Generando..." : "Generar Examen"}
       </Button>
     </form>

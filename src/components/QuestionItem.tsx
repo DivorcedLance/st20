@@ -16,11 +16,11 @@ export default function QuestionItem({ question, onEdit, onDelete }: QuestionIte
 
   return (
     <div className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 space-y-3">
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col space-y-3">
         <div className="flex-1">
-          <div className="flex items-center space-x-2 mb-2">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
             <Badge variant="outline">{question.type_name}</Badge>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               {question.course_name} - {question.topic_name}
             </span>
             {question.time_limit && (
@@ -67,11 +67,11 @@ export default function QuestionItem({ question, onEdit, onDelete }: QuestionIte
           )}
         </div>
 
-        <div className="flex space-x-2 ml-4">
-          <Button size="sm" variant="outline" onClick={() => onEdit(question)}>
+        <div className="flex space-x-2">
+          <Button size="sm" variant="outline" onClick={() => onEdit(question)} className="flex-1 sm:flex-none">
             Editar
           </Button>
-          <Button size="sm" variant="destructive" onClick={() => onDelete(question.id)}>
+          <Button size="sm" variant="destructive" onClick={() => onDelete(question.id)} className="flex-1 sm:flex-none">
             Eliminar
           </Button>
         </div>

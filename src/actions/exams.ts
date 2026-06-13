@@ -137,6 +137,40 @@ export async function gradeExam(questionIds: number[]): Promise<ExamResult[]> {
   return results;
 }
 
+export async function fetchStudyQuestions(data: unknown): Promise<ExamQuestion[]> {
+  const user = await getCurrentUser();
+  if (!user) {
+    throw new Error("No autenticado");
+  }
+
+  const validated = createExamSchema.parse(data);
+
+  let sql = `
+    SELECT DISTINCT q.*
+    FROM question q
+    JOIN topic t ON q.topic_id = t.id
+    WHERE t.course_id IN (${validated.course_ids.map(() => "?").join(", ")})
+  `;
+
+  const args: number[] = [...validated.course_ids];
+
+  if (validated.topic_ids && validated.topic_ids.length > 0) {
+    sql += ` AND q.topic_id IN (${validated.topic_ids.map(() => "?").join(", ")})`;
+    args.push(...validated.topic_ids);
+  }
+
+  sql += " ORDER BY RANDOM()";
+
+  const result = await db.execute({ sql, args });
+  const questions = result.rows as unknown as Question[];
+
+  return questions.map((q) => ({
+    question: q,
+    question_data: JSON.parse(q.question_data) as QuestionData,
+    time_limit: null,
+  }));
+}
+
 export async function getAnswerHistory(questionId: number): Promise<Answer[]> {
   const user = await getCurrentUser();
   if (!user) {

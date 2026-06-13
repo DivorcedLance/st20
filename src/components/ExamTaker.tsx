@@ -386,26 +386,45 @@ export default function ExamTaker({ examQuestions }: ExamTakerProps) {
         </CardContent>
       </Card>
 
-      <div className="flex justify-center">
+      <div className="flex flex-col items-center gap-2">
         <div className="flex flex-wrap gap-2 justify-center">
-          {examQuestions.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                setCurrentQuestionIndex(index);
-                setTimeRemaining(null);
-              }}
-              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 transition-colors text-sm sm:text-base ${
-                index === currentQuestionIndex
-                  ? "bg-blue-600 text-white border-blue-600"
-                  : answers.has(examQuestions[index].question.id)
-                  ? "bg-green-100 dark:bg-green-900 border-green-600"
-                  : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
-              }`}
-            >
-              {index + 1}
-            </button>
-          ))}
+          {examQuestions.map((_, index) => {
+            const feedback = questionFeedback.get(examQuestions[index].question.id);
+            return (
+              <button
+                key={index}
+                onClick={() => {
+                  setCurrentQuestionIndex(index);
+                  setTimeRemaining(null);
+                }}
+                className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 transition-colors text-sm sm:text-base ${
+                  index === currentQuestionIndex
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : feedback
+                    ? feedback.isCorrect
+                      ? "bg-green-500 text-white border-green-500"
+                      : "bg-red-500 text-white border-red-500"
+                    : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+                }`}
+              >
+                {index + 1}
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex items-center justify-center gap-3 text-xs text-gray-500 dark:text-gray-400 mt-2">
+          <span className="flex items-center gap-1">
+            <span className="w-3 h-3 rounded-full bg-green-500 inline-block" />
+            correcta
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-3 h-3 rounded-full bg-red-500 inline-block" />
+            incorrecta
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-3 h-3 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 inline-block" />
+            sin responder
+          </span>
         </div>
       </div>
     </div>

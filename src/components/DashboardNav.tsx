@@ -22,6 +22,7 @@ export default function DashboardNav({ user }: DashboardNavProps) {
     { href: "/dashboard/courses", label: "Cursos" },
     { href: "/dashboard/topics", label: "Temas" },
     { href: "/dashboard/questions", label: "Preguntas" },
+    { href: "/dashboard/study", label: "Estudiar" },
     { href: "/dashboard/exam", label: "Generar Examen" },
     { href: "/dashboard/settings", label: "Configuración" },
   ];

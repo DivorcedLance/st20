@@ -54,6 +54,20 @@ export default async function DashboardPage() {
 
         <Card>
           <CardHeader>
+            <CardTitle>Modo Estudio</CardTitle>
+            <CardDescription>Repasar preguntas con respuestas</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/dashboard/study">
+              <Button className="w-full" variant="secondary">
+                Estudiar
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
             <CardTitle>Generar Examen</CardTitle>
             <CardDescription>Crear un nuevo examen</CardDescription>
           </CardHeader>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { submitAnswer, gradeExam } from "@/actions/exams";
+import { submitAnswer } from "@/actions/exams";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -10,16 +10,23 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import ReactMarkdown from "react-markdown";
-import type { ExamQuestion, ExamResult } from "@/types";
+import type { ExamQuestion, ExamResult, AnswerData } from "@/types";
 
 interface ExamTakerProps {
   examQuestions: ExamQuestion[];
+}
+
+interface QuestionFeedback {
+  isCorrect: boolean;
+  correctAnswer: boolean | number;
+  explanation?: string;
 }
 
 export default function ExamTaker({ examQuestions }: ExamTakerProps) {
   const router = useRouter();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Map<number, unknown>>(new Map());
+  const [questionFeedback, setQuestionFeedback] = useState<Map<number, QuestionFeedback>>(new Map());
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [results, setResults] = useState<ExamResult[] | null>(null);
@@ -27,6 +34,7 @@ export default function ExamTaker({ examQuestions }: ExamTakerProps) {
   const currentExamQuestion = examQuestions[currentQuestionIndex];
   const currentQuestion = currentExamQuestion.question;
   const currentData = currentExamQuestion.question_data;
+  const currentFeedback = questionFeedback.get(currentQuestion.id);
 
   useEffect(() => {
     if (!currentExamQuestion.time_limit || results) return;
@@ -51,10 +59,40 @@ export default function ExamTaker({ examQuestions }: ExamTakerProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentQuestionIndex, results]);
 
+  const evaluateAnswer = (questionId: number, answer: unknown): QuestionFeedback => {
+    const eq = examQuestions.find((eq) => eq.question.id === questionId)!;
+    const data = eq.question_data;
+
+    if (eq.question.type_id === 0) {
+      const tfData = data as { correct_answer: boolean; explanation?: string };
+      const answerBool = answer as boolean;
+      return {
+        isCorrect: answerBool === tfData.correct_answer,
+        correctAnswer: tfData.correct_answer,
+        explanation: tfData.explanation,
+      };
+    } else {
+      const mcData = data as { correct_answer: number; explanation?: string };
+      const answerNum = answer as number;
+      return {
+        isCorrect: answerNum === mcData.correct_answer,
+        correctAnswer: mcData.correct_answer,
+        explanation: mcData.explanation,
+      };
+    }
+  };
+
   const handleAnswer = (answer: unknown) => {
+    if (currentFeedback) return;
+
     const newAnswers = new Map(answers);
     newAnswers.set(currentQuestion.id, answer);
     setAnswers(newAnswers);
+
+    const feedback = evaluateAnswer(currentQuestion.id, answer);
+    const newFeedback = new Map(questionFeedback);
+    newFeedback.set(currentQuestion.id, feedback);
+    setQuestionFeedback(newFeedback);
   };
 
   const handleNext = async () => {
@@ -96,9 +134,25 @@ export default function ExamTaker({ examQuestions }: ExamTakerProps) {
         });
       }
 
-      // Grade exam
-      const questionIds = examQuestions.map((eq) => eq.question.id);
-      const examResults = await gradeExam(questionIds);
+      const examResults: ExamResult[] = examQuestions.reduce<ExamResult[]>((acc, eq) => {
+          const feedback = questionFeedback.get(eq.question.id);
+          if (!feedback) return acc;
+
+          const answer = answers.get(eq.question.id);
+          const userAnswer: AnswerData = typeof answer === "boolean"
+            ? { answer: answer }
+            : { answer: answer as number };
+
+          acc.push({
+            question_id: eq.question.id,
+            user_answer: userAnswer,
+            correct_answer: feedback.correctAnswer,
+            is_correct: feedback.isCorrect,
+            explanation: feedback.explanation,
+          });
+          return acc;
+        }, []);
+
       setResults(examResults);
     } catch (error) {
       alert("Error al enviar el examen: " + (error as Error).message);
@@ -230,6 +284,7 @@ export default function ExamTaker({ examQuestions }: ExamTakerProps) {
             <RadioGroup
               value={answers.get(currentQuestion.id)?.toString() || ""}
               onValueChange={(value) => handleAnswer(value === "true")}
+              disabled={!!currentFeedback}
             >
               <div className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
                 <RadioGroupItem value="true" id="true" />
@@ -248,6 +303,7 @@ export default function ExamTaker({ examQuestions }: ExamTakerProps) {
             <RadioGroup
               value={answers.get(currentQuestion.id)?.toString() || ""}
               onValueChange={(value) => handleAnswer(parseInt(value))}
+              disabled={!!currentFeedback}
             >
               {(currentData as { options: string[] }).options.map((option, index) => (
                 <div key={index} className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
@@ -258,6 +314,39 @@ export default function ExamTaker({ examQuestions }: ExamTakerProps) {
                 </div>
               ))}
             </RadioGroup>
+          )}
+
+          {currentFeedback && (
+            <div className={`p-4 rounded-lg border-2 ${
+              currentFeedback.isCorrect
+                ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                : "border-red-500 bg-red-50 dark:bg-red-900/20"
+            }`}>
+              <div className="flex items-center gap-2 mb-2">
+                <Badge variant={currentFeedback.isCorrect ? "default" : "destructive"}>
+                  {currentFeedback.isCorrect ? "✓ Correcta" : "✗ Incorrecta"}
+                </Badge>
+              </div>
+
+              {!currentFeedback.isCorrect && (
+                <div className="text-sm mb-2">
+                  <span className="font-medium">Respuesta correcta:</span>{" "}
+                  {currentQuestion.type_id === 0
+                    ? (currentFeedback.correctAnswer ? "Verdadero" : "Falso")
+                    : (currentData as { options: string[] }).options[currentFeedback.correctAnswer as number]
+                  }
+                </div>
+              )}
+
+              {currentFeedback.explanation && (
+                <div className="text-sm">
+                  <div className="font-medium mb-1">Explicación:</div>
+                  <div className="prose dark:prose-invert prose-sm max-w-none">
+                    <ReactMarkdown>{currentFeedback.explanation}</ReactMarkdown>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 pt-4 border-t">

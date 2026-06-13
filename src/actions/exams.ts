@@ -159,7 +159,7 @@ export async function fetchStudyQuestions(data: unknown): Promise<ExamQuestion[]
     args.push(...validated.topic_ids);
   }
 
-  sql += " ORDER BY RANDOM()";
+  sql += " ORDER BY t.course_id, t.number, q.id";
 
   const result = await db.execute({ sql, args });
   const questions = result.rows as unknown as Question[];

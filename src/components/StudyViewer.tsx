@@ -35,6 +35,10 @@ export default function StudyViewer({ studyQuestions }: StudyViewerProps) {
         </h1>
       </div>
 
+      <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1 px-1">
+        {current.course_name} &mdash; {current.topic_name}
+      </div>
+
       <Card>
         <CardHeader>
           <Badge variant="outline" className="self-start">

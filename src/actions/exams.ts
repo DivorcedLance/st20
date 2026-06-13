@@ -15,9 +15,10 @@ export async function generateExam(data: unknown): Promise<ExamQuestion[]> {
 
   // Build query to get questions
   let sql = `
-    SELECT DISTINCT q.*
+    SELECT DISTINCT q.*, c.name as course_name, t.name as topic_name
     FROM question q
     JOIN topic t ON q.topic_id = t.id
+    JOIN course c ON t.course_id = c.id
     WHERE t.course_id IN (${validated.course_ids.map(() => "?").join(", ")})
   `;
   
@@ -36,15 +37,17 @@ export async function generateExam(data: unknown): Promise<ExamQuestion[]> {
   }
 
   const result = await db.execute({ sql, args });
-  const questions = result.rows as unknown as Question[];
+  const rows = result.rows as unknown as (Question & { course_name: string; topic_name: string })[];
 
   // Build exam questions with time limits
-  const examQuestions: ExamQuestion[] = questions.map((q) => ({
-    question: q,
-    question_data: JSON.parse(q.question_data) as QuestionData,
+  const examQuestions: ExamQuestion[] = rows.map((row) => ({
+    question: row,
+    question_data: JSON.parse(row.question_data) as QuestionData,
     time_limit: validated.use_individual_time_limits 
-      ? q.time_limit 
+      ? row.time_limit 
       : validated.global_time_limit || null,
+    course_name: row.course_name,
+    topic_name: row.topic_name,
   }));
 
   return examQuestions;
@@ -146,9 +149,10 @@ export async function fetchStudyQuestions(data: unknown): Promise<ExamQuestion[]
   const validated = createExamSchema.parse(data);
 
   let sql = `
-    SELECT DISTINCT q.*
+    SELECT DISTINCT q.*, c.name as course_name, t.name as topic_name
     FROM question q
     JOIN topic t ON q.topic_id = t.id
+    JOIN course c ON t.course_id = c.id
     WHERE t.course_id IN (${validated.course_ids.map(() => "?").join(", ")})
   `;
 
@@ -162,12 +166,14 @@ export async function fetchStudyQuestions(data: unknown): Promise<ExamQuestion[]
   sql += " ORDER BY t.course_id, t.number, q.id";
 
   const result = await db.execute({ sql, args });
-  const questions = result.rows as unknown as Question[];
+  const rows = result.rows as unknown as (Question & { course_name: string; topic_name: string })[];
 
-  return questions.map((q) => ({
-    question: q,
-    question_data: JSON.parse(q.question_data) as QuestionData,
+  return rows.map((row) => ({
+    question: row,
+    question_data: JSON.parse(row.question_data) as QuestionData,
     time_limit: null,
+    course_name: row.course_name,
+    topic_name: row.topic_name,
   }));
 }
 

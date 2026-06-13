@@ -99,6 +99,8 @@ export interface ExamQuestion {
   question: Question;
   question_data: QuestionData;
   time_limit: number | null;
+  course_name: string;
+  topic_name: string;
 }
 
 export interface ExamResult {

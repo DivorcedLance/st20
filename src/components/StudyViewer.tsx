@@ -121,27 +121,48 @@ export default function StudyViewer({ studyQuestions }: StudyViewerProps) {
           ← Anterior
         </Button>
 
-        <div className="flex gap-2">
-          {studyQuestions.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => markVisited(index)}
-              className={`w-8 h-8 rounded-full border-2 text-sm transition-colors ${
-                index === currentIndex
-                  ? "bg-blue-600 text-white border-blue-600"
-                  : visitedQuestions.has(index)
-                  ? "bg-green-500 text-white border-green-500"
-                  : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-              }`}
-            >
-              {index + 1}
-            </button>
-          ))}
+        <div className="flex items-center gap-1 overflow-x-auto max-w-[40vw] md:max-w-md">
+          {(() => {
+            const total = studyQuestions.length;
+            const pages: (number | "ellipsis")[] = [];
+
+            if (total <= 7) {
+              for (let i = 0; i < total; i++) pages.push(i);
+            } else {
+              pages.push(0);
+              if (currentIndex > 2) pages.push("ellipsis");
+              const start = Math.max(1, currentIndex - 1);
+              const end = Math.min(total - 2, currentIndex + 1);
+              for (let i = start; i <= end; i++) pages.push(i);
+              if (currentIndex < total - 3) pages.push("ellipsis");
+              pages.push(total - 1);
+            }
+
+            return pages.map((page, i) =>
+              page === "ellipsis" ? (
+                <span key={`e-${i}`} className="px-0.5 text-gray-400 text-sm">...</span>
+              ) : (
+                <button
+                  key={page}
+                  onClick={() => markVisited(page)}
+                  className={`w-8 h-8 rounded-full border-2 text-sm transition-colors flex-shrink-0 ${
+                    page === currentIndex
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : visitedQuestions.has(page)
+                      ? "bg-green-500 text-white border-green-500"
+                      : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  }`}
+                >
+                  {page + 1}
+                </button>
+              )
+            );
+          })()}
           {studyQuestions.length > 0 && (
-            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 ml-2">
-              <span className="w-3 h-3 rounded-full bg-green-500 inline-block" />
+            <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 ml-2 flex-shrink-0">
+              <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block" />
               <span>vista</span>
-              <span className="w-3 h-3 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 inline-block ml-1" />
+              <span className="w-2.5 h-2.5 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 inline-block ml-0.5" />
               <span>pendiente</span>
             </div>
           )}
